@@ -16,6 +16,7 @@ export function takeScreenshot(): Promise<string | void> {
         const base64Data = screenshot.toString('base64')
         return base64Data
       }
+      return undefined
     })
     .catch((error) => {
       console.error('Error taking screenshot:', error)

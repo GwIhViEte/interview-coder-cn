@@ -47,6 +47,7 @@ export function AppContent() {
 
       return () => clearTimeout(timer)
     }
+    return undefined
   }, [solutionChunks, isLoading, setIsLoading])
 
   useEffect(() => {
