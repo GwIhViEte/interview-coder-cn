@@ -1,5 +1,7 @@
 # 编码面试解题助手
 
+![使用演示](https://github.com/user-attachments/assets/19781594-3108-4711-a54b-9d36496787bc)
+
 ## 项目简介
 
 这是一个面向中文用户的编程解题助手，适配国内AI生态，简单易用。
@@ -70,12 +72,12 @@ $ npm run dev
 
 ## 视频教程
 
-TODO
+具体可到 [Wiki](https://github.com/ooboqoo/interview-coder-cn/wiki) 页面查看。
 
 
 ## 许可协议（License）
 
-> 虽然这套代码目前在 GitHub 上以解题助手的形式做推广，但实际应用场景非常广泛。后续期望在更多场景做商业落地，有兴趣的欢迎洽谈合作。
+> 虽然这套代码目前在 GitHub 上以「解题助手」的形式做推广，但实际应用场景非常广泛。后续期望在更多场景做商业落地，欢迎有兴趣朋友洽谈合作事项。
 
 本项目采用 **[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/deed.zh)** 协议许可。
 
