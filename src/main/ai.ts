@@ -3,12 +3,12 @@ import { createOpenAI } from '@ai-sdk/openai'
 import { PROMPT_SYSTEM } from './prompts'
 import { settings } from './settings'
 
-const openai = createOpenAI({
-  baseURL: settings.apiBaseURL,
-  apiKey: settings.apiKey
-})
-
 export function getSolutionStream(base64Image: string) {
+  const openai = createOpenAI({
+    baseURL: settings.apiBaseURL,
+    apiKey: settings.apiKey
+  })
+
   const { textStream } = streamText({
     model: openai(settings.model),
     system: settings.customPrompt || PROMPT_SYSTEM,
