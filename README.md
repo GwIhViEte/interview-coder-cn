@@ -84,3 +84,12 @@ $ npm run dev
 您可以自由使用、复制、修改本项目代码，但 **禁止任何形式的商业用途**，包括但不限于售卖、集成入商业产品、SaaS 服务等。
 
 如需商业授权，请联系作者获得书面许可。
+
+
+## 类似项目
+
+原 [Interview-Coder](https://github.com/ibttf/interview-coder) 项目在网络上爆火之后，出现了很多类似的项目（本项目也是其中一个），每个项目都各有特色，这里列举一些比较火的项目供参考。
+
+- https://github.com/sohzm/cheating-daddy 作者是前段时间在硅谷大热的争议程序员 Soham Parekh
+- https://github.com/pickle-com/glass
+- https://github.com/j4wg/interview-coder-withoupaywall-opensource
