@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { shell, BrowserWindow } from 'electron'
+import { shell, app, BrowserWindow } from 'electron'
 import { is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
@@ -30,6 +30,9 @@ export function createWindow(): void {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+    mainWindow.setAlwaysOnTop(true, 'screen-saver', 1)
+    mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+    app.dock?.show()
     mainWindow.setContentProtection(true)
   })
 
