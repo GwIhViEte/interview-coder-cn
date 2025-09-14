@@ -16,7 +16,9 @@ const defaultModels = [
   { value: 'gpt-4o-mini', label: 'gpt-4o-mini' },
   { value: 'gpt-4o', label: 'gpt-4o' },
   { value: 'gpt-4.1-mini', label: 'gpt-4.1-mini' },
-  { value: 'gpt-4.1', label: 'gpt-4.1' }
+  { value: 'gpt-4.1', label: 'gpt-4.1' },
+  { value: 'gpt-5-mini', label: 'gpt-5-mini' },
+  { value: 'gpt-5', label: 'gpt-5' }
 ]
 
 export function SelectModel({
@@ -92,7 +94,9 @@ export function SelectModel({
                   }}
                 >
                   {m.label}
-                  <Check className={cn('ml-auto', value === m.value ? 'opacity-100' : 'opacity-0')} />
+                  <Check
+                    className={cn('ml-auto', value === m.value ? 'opacity-100' : 'opacity-0')}
+                  />
                 </CommandItem>
               ))}
               {showCreate && (
@@ -112,4 +116,3 @@ export function SelectModel({
     </Popover>
   )
 }
-

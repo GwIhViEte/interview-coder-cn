@@ -5,11 +5,11 @@ interface Settings {
   // theme: 'light' | 'dark'an
   apiBaseURL: string
   apiKey: string
+  model: string
   customPrompt: string
 
   opacity: number
   codeLanguage: string
-  model: string
 }
 
 interface SettingsStore extends Settings {
@@ -20,9 +20,9 @@ interface SettingsStore extends Settings {
 const defaultSettings: Settings = {
   apiBaseURL: '',
   apiKey: '',
+  model: '',
   customPrompt: '',
   codeLanguage: '',
-  model: '',
 
   opacity: 0.8
 }

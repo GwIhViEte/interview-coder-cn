@@ -15,12 +15,12 @@ import { Slider } from '@/components/ui/slider'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { useSettingsStore } from '@/lib/store/settings'
+import { SelectModel } from './SelectModel'
 import { SelectLanguage } from './SelectLanguage'
 import { CustomShortcuts, ResetDefaultShortcuts } from './CustomShortcuts'
-import { SelectModel } from './SelectModel'
 
 export default function SettingsPage() {
-  const { opacity, codeLanguage, apiBaseURL, apiKey, customPrompt, model, updateSetting } =
+  const { opacity, codeLanguage, apiBaseURL, apiKey, model, customPrompt, updateSetting } =
     useSettingsStore()
   const [showApiKey, setShowApiKey] = useState(false)
   const [enableCustomPrompt, setEnableCustomPrompt] = useState(customPrompt.trim().length > 0)
