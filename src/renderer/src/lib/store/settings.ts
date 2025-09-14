@@ -9,6 +9,7 @@ interface Settings {
 
   opacity: number
   codeLanguage: string
+  model: string
 }
 
 interface SettingsStore extends Settings {
@@ -21,6 +22,7 @@ const defaultSettings: Settings = {
   apiKey: '',
   customPrompt: '',
   codeLanguage: '',
+  model: '',
 
   opacity: 0.8
 }
