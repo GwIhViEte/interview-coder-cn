@@ -17,9 +17,10 @@ import { Switch } from '@/components/ui/switch'
 import { useSettingsStore } from '@/lib/store/settings'
 import { SelectLanguage } from './SelectLanguage'
 import { CustomShortcuts, ResetDefaultShortcuts } from './CustomShortcuts'
+import { SelectModel } from './SelectModel'
 
 export default function SettingsPage() {
-  const { opacity, codeLanguage, apiBaseURL, apiKey, customPrompt, updateSetting } =
+  const { opacity, codeLanguage, apiBaseURL, apiKey, customPrompt, model, updateSetting } =
     useSettingsStore()
   const [showApiKey, setShowApiKey] = useState(false)
   const [enableCustomPrompt, setEnableCustomPrompt] = useState(customPrompt.trim().length > 0)
@@ -69,7 +70,7 @@ export default function SettingsPage() {
                 value={apiBaseURL}
                 onChange={(e) => updateSetting('apiBaseURL', e.target.value)}
                 className="w-60 px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="可不填，默认使用 OpenAI 的 API"
+                placeholder="可为空，默认使用 OpenAI 的 API"
               />
             </div>
 
@@ -81,7 +82,7 @@ export default function SettingsPage() {
                   value={apiKey}
                   onChange={(e) => updateSetting('apiKey', e.target.value)}
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="请输入 API Key"
+                  placeholder="输入 API Key"
                 />
                 <Button
                   variant="ghost"
@@ -93,10 +94,13 @@ export default function SettingsPage() {
                 </Button>
               </div>
             </div>
+
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">Model</label>
+              <SelectModel value={model} onChange={(val) => updateSetting('model', val)} />
+            </div>
           </div>
         </div>
-
-        {/* General Settings */}
         <div className="bg-gray-300/80 rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4 flex items-center">
             <SquareTerminal className="h-5 w-5 mr-2" />

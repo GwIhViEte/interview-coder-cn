@@ -10,7 +10,7 @@ export function getSolutionStream(base64Image: string) {
   })
 
   const { textStream } = streamText({
-    model: openai(settings.model),
+    model: openai(settings.model || 'gpt-4o-mini'),
     system: settings.customPrompt || PROMPT_SYSTEM,
     messages: [
       {
