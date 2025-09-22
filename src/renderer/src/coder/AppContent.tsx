@@ -17,6 +17,15 @@ export function AppContent() {
     clearSolution
   } = useSolutionStore()
 
+  // Ensure any unfinished fenced code block is closed when a run ends
+  const ensureClosedFence = () => {
+    const text = useSolutionStore.getState().solutionChunks.join('')
+    const fenceCount = (text.match(/```/g) || []).length
+    if (fenceCount % 2 === 1) {
+      addSolutionChunk('\n```')
+    }
+  }
+
   useEffect(() => {
     // Listen for screenshot events
     window.api.onScreenshotTaken((data: string) => {
@@ -38,6 +47,24 @@ export function AppContent() {
     }
   }, [setScreenshotData, clearSolution, setIsLoading, addSolutionChunk])
 
+  useEffect(() => {
+    window.api.onSolutionComplete(() => {
+      setIsLoading(false)
+    })
+    window.api.onSolutionStopped(() => {
+      setIsLoading(false)
+    })
+    window.api.onSolutionError((message: string) => {
+      setIsLoading(false)
+      addSolutionChunk(`\n\n> 生成失败：${message}`)
+    })
+    return () => {
+      window.api.removeSolutionCompleteListener()
+      window.api.removeSolutionStoppedListener()
+      window.api.removeSolutionErrorListener()
+    }
+  }, [setIsLoading, addSolutionChunk])
+
   // Mark solution as complete when chunks stop coming
   useEffect(() => {
     if (isLoading && solutionChunks.length > 0) {
@@ -49,6 +76,13 @@ export function AppContent() {
     }
     return undefined
   }, [solutionChunks, isLoading, setIsLoading])
+
+  // When run ends (isLoading goes false), ensure code fence is closed
+  useEffect(() => {
+    if (!isLoading) {
+      ensureClosedFence()
+    }
+  }, [isLoading])
 
   useEffect(() => {
     window.api.onScrollPageUp(() => {
