@@ -112,6 +112,11 @@ const callbacks: Record<string, () => void> = {
     }
   },
 
+  // Stop current AI solution stream
+  stopSolutionStream: () => {
+    abortCurrentStream('user')
+  },
+
   ignoreOrEnableMouse: () => {
     const mainWindow = global.mainWindow
     if (!mainWindow || mainWindow.isDestroyed() || !state.inCoderPage) return

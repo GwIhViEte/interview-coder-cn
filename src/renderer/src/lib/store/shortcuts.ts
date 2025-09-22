@@ -38,6 +38,11 @@ const defaultShortcuts: Record<string, Omit<Shortcut, 'defaultKey'>> = {
     category: 'Window Management'
   },
   takeScreenshot: { action: 'takeScreenshot', key: 'Alt+Enter', category: 'Screenshot & AI' },
+  stopSolutionStream: {
+    action: 'stopSolutionStream',
+    key: 'Alt+.',
+    category: 'Screenshot & AI'
+  },
   pageUp: { action: 'pageUp', key: 'CommandOrControl+J', category: 'Navigation' },
   pageDown: { action: 'pageDown', key: 'CommandOrControl+K', category: 'Navigation' },
   moveMainWindowUp: {
@@ -95,7 +100,24 @@ export const useShortcutsStore = create<ShortcutsStore>()(
     }),
     {
       name: 'interview-coder-shortcuts',
-      version: 1
+      version: 2,
+      migrate: (state: any) => {
+        if (!state?.shortcuts) return state
+        // Merge in any new default shortcuts that are missing
+        const defaults = Object.fromEntries(
+          Object.entries(defaultShortcuts).map(([action, shortcut]) => [
+            action,
+            { ...shortcut, defaultKey: shortcut.key }
+          ])
+        )
+        return {
+          ...state,
+          shortcuts: {
+            ...defaults,
+            ...state.shortcuts
+          }
+        }
+      }
     }
   )
 )
