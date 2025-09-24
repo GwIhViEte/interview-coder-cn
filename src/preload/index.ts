@@ -55,6 +55,33 @@ const api = {
     ipcRenderer.removeAllListeners('solution-chunk')
   },
 
+  // Stop solution stream
+  stopSolutionStream: () => ipcRenderer.invoke('stopSolutionStream'),
+
+  // Listen for solution completion
+  onSolutionComplete: (callback: () => void) => {
+    ipcRenderer.on('solution-complete', callback)
+  },
+  removeSolutionCompleteListener: () => {
+    ipcRenderer.removeAllListeners('solution-complete')
+  },
+
+  onSolutionStopped: (callback: () => void) => {
+    ipcRenderer.on('solution-stopped', callback)
+  },
+  removeSolutionStoppedListener: () => {
+    ipcRenderer.removeAllListeners('solution-stopped')
+  },
+
+  onSolutionError: (callback: (message: string) => void) => {
+    ipcRenderer.on('solution-error', (_event, message) => {
+      callback(message)
+    })
+  },
+  removeSolutionErrorListener: () => {
+    ipcRenderer.removeAllListeners('solution-error')
+  },
+
   // Listen for scroll page up
   onScrollPageUp: (callback: () => void) => {
     ipcRenderer.on('scroll-page-up', callback)

@@ -19,6 +19,13 @@ declare global {
       removeScreenshotListener: () => void
       onSolutionChunk: (callback: (chunk: string) => void) => void
       removeSolutionChunkListener: () => void
+      stopSolutionStream: () => Promise<boolean>
+      onSolutionComplete: (callback: () => void) => void
+      removeSolutionCompleteListener: () => void
+      onSolutionStopped: (callback: () => void) => void
+      removeSolutionStoppedListener: () => void
+      onSolutionError: (callback: (message: string) => void) => void
+      removeSolutionErrorListener: () => void
       onScrollPageUp: (callback: () => void) => void
       removeScrollPageUpListener: () => void
       onScrollPageDown: (callback: () => void) => void

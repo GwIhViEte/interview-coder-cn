@@ -1,5 +1,24 @@
 import 'dotenv/config'
 import { app, BrowserWindow, globalShortcut } from 'electron'
+
+// Swallow AbortError from user-initiated stream cancellations to keep console clean
+function isAbortError(error: unknown): boolean {
+  const err = error as any
+  return (
+    !!err &&
+    (err.name === 'AbortError' || err.code === 'ABORT_ERR' || /aborted/i.test(String(err.message)))
+  )
+}
+
+process.on('unhandledRejection', (error) => {
+  if (isAbortError(error)) return
+  console.error(error)
+})
+
+process.on('uncaughtException', (error) => {
+  if (isAbortError(error)) return
+  console.error(error)
+})
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import './shortcuts'
 import { createWindow } from './main-window'
