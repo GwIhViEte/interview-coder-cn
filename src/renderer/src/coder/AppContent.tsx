@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useShortcutsStore } from '@/lib/store/shortcuts'
 import { useSolutionStore } from '@/lib/store/solution'
+import { useRecordsStore } from '@/lib/store/records'
 import MarkdownRenderer from '@/components/MarkdownRenderer'
 import ShortcutRenderer from '@/components/ShortcutRenderer'
 
@@ -50,6 +51,13 @@ export function AppContent() {
   useEffect(() => {
     window.api.onSolutionComplete(() => {
       setIsLoading(false)
+      // Ensure code fence is closed before saving
+      ensureClosedFence()
+      const { screenshotData, solutionChunks } = useSolutionStore.getState()
+      if (solutionChunks.length > 0) {
+        const content = solutionChunks.join('')
+        useRecordsStore.getState().addRecord({ screenshotData, content })
+      }
     })
     window.api.onSolutionStopped(() => {
       setIsLoading(false)

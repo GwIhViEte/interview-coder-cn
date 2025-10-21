@@ -4,6 +4,7 @@ import { Toaster } from 'sonner'
 import CoderPage from '@/coder'
 import SettingsPage from '@/settings'
 import HelpPage from '@/help'
+import RecordsPage from '@/records'
 import { useSettingsStore } from '@/lib/store/settings'
 import { useShortcutsStore } from '@/lib/store/shortcuts'
 import { getCloneableFields } from '@/lib/utils'
@@ -50,6 +51,7 @@ export default function App() {
           <Route index element={<CoderPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="help" element={<HelpPage />} />
+          <Route path="records" element={<RecordsPage />} />
         </Routes>
       </HashRouter>
 
