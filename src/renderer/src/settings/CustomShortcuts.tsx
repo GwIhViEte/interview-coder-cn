@@ -70,6 +70,7 @@ export function CustomShortcuts() {
         <div className="space-y-2">
           <h3 className="text-sm text-gray-500">截图与AI</h3>
           <Shortcut label="截图" shortcut="takeScreenshot" />
+          <Shortcut label="停止生成" shortcut="stopSolutionStream" />
         </div>
 
         {/* Navigation */}
@@ -86,11 +87,6 @@ export function CustomShortcuts() {
           <Shortcut label="向下移动窗口" shortcut="moveMainWindowDown" />
           <Shortcut label="向左移动窗口" shortcut="moveMainWindowLeft" />
           <Shortcut label="向右移动窗口" shortcut="moveMainWindowRight" />
-        </div>
-        {/* AI 控制 */}
-        <div className="space-y-2">
-          <h3 className="text-sm text-gray-500">AI 控制</h3>
-          <Shortcut label="停止生成" shortcut="stopSolutionStream" />
         </div>
       </div>
     </ShortcutsContext.Provider>

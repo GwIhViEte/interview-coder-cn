@@ -1,4 +1,4 @@
-import { Pointer, PointerOff, Square } from 'lucide-react'
+import { Pointer, PointerOff, OctagonX } from 'lucide-react'
 import { useSolutionStore } from '@/lib/store/solution'
 import { useShortcutsStore } from '@/lib/store/shortcuts'
 import { useAppStore } from '@/lib/store/app'
@@ -22,15 +22,20 @@ export function AppStatusBar() {
           <div className="flex items-center space-x-2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-r-2 border-[currentColor]"></div>
             <span className="text-sm">正在生成...</span>
-            <Button
-              variant="secondary"
-              size="sm"
-              className="h-6 px-2 text-xs"
-              onClick={handleStop}
-            >
-              <Square className="w-3 h-3 mr-1" />
-              停止生成
-            </Button>
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex justify-center z-50 pointer-events-none">
+              <Button
+                variant="secondary"
+                className="h-8 px-4 text-base shadow-lg pointer-events-auto"
+                onClick={handleStop}
+              >
+                <OctagonX className="w-4 h-4" />
+                停止生成
+                <ShortcutRenderer
+                  shortcut={shortcuts.stopSolutionStream.key}
+                  className="inline-block border bg-transparent py-0 px-1"
+                />
+              </Button>
+            </div>
           </div>
         )}
       </div>
