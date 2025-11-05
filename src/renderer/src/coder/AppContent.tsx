@@ -8,7 +8,6 @@ const SCROLL_OFFSET = 120
 
 export function AppContent() {
   const {
-    isLoading,
     screenshotData,
     solutionChunks,
     setScreenshotData,
@@ -16,15 +15,6 @@ export function AppContent() {
     addSolutionChunk,
     clearSolution
   } = useSolutionStore()
-
-  // Ensure any unfinished fenced code block is closed when a run ends
-  const ensureClosedFence = () => {
-    const text = useSolutionStore.getState().solutionChunks.join('')
-    const fenceCount = (text.match(/```/g) || []).length
-    if (fenceCount % 2 === 1) {
-      addSolutionChunk('\n```')
-    }
-  }
 
   useEffect(() => {
     // Listen for screenshot events
@@ -64,25 +54,6 @@ export function AppContent() {
       window.api.removeSolutionErrorListener()
     }
   }, [setIsLoading, addSolutionChunk])
-
-  // Mark solution as complete when chunks stop coming
-  useEffect(() => {
-    if (isLoading && solutionChunks.length > 0) {
-      const timer = setTimeout(() => {
-        setIsLoading(false)
-      }, 1000) // Wait 1 second after last chunk to mark as complete
-
-      return () => clearTimeout(timer)
-    }
-    return undefined
-  }, [solutionChunks, isLoading, setIsLoading])
-
-  // When run ends (isLoading goes false), ensure code fence is closed
-  useEffect(() => {
-    if (!isLoading) {
-      ensureClosedFence()
-    }
-  }, [isLoading])
 
   useEffect(() => {
     window.api.onScrollPageUp(() => {

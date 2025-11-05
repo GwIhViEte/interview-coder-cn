@@ -58,6 +58,9 @@ const api = {
   // Stop solution stream
   stopSolutionStream: () => ipcRenderer.invoke('stopSolutionStream'),
 
+  // Send follow-up question
+  sendFollowUpQuestion: (question: string) => ipcRenderer.invoke('sendFollowUpQuestion', question),
+
   // Listen for solution completion
   onSolutionComplete: (callback: () => void) => {
     ipcRenderer.on('solution-complete', callback)

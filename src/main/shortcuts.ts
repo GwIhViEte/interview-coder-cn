@@ -1,6 +1,7 @@
 import { globalShortcut, ipcMain } from 'electron'
+import type { ModelMessage } from 'ai'
 import { takeScreenshot } from './take-screenshot'
-import { getSolutionStream } from './ai'
+import { getSolutionStream, getFollowUpStream } from './ai'
 import { state } from './state'
 import { settings } from './settings'
 
@@ -29,6 +30,9 @@ interface StreamContext {
 
 let currentStreamContext: StreamContext | null = null
 
+// Conversation history tracking
+let conversationMessages: ModelMessage[] = []
+
 function abortCurrentStream(reason: AbortReason) {
   if (!currentStreamContext) return
   currentStreamContext.reason = reason
@@ -53,6 +57,22 @@ const callbacks: Record<string, () => void> = {
     abortCurrentStream('new-request')
     const screenshotData = await takeScreenshot()
     if (screenshotData && mainWindow && !mainWindow.isDestroyed()) {
+      conversationMessages = [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'text',
+              text: `这是屏幕截图`
+            },
+            {
+              type: 'image',
+              image: screenshotData
+            }
+          ]
+        }
+      ]
+
       const streamContext: StreamContext = {
         controller: new AbortController(),
         reason: null
@@ -61,6 +81,7 @@ const callbacks: Record<string, () => void> = {
       mainWindow.webContents.send('screenshot-taken', screenshotData)
       let endedNaturally = true
       let streamStarted = false
+      let assistantResponse = ''
       try {
         const solutionStream = getSolutionStream(screenshotData, streamContext.controller.signal)
         streamStarted = true
@@ -70,6 +91,7 @@ const callbacks: Record<string, () => void> = {
               endedNaturally = false
               break
             }
+            assistantResponse += chunk
             mainWindow.webContents.send('solution-chunk', chunk)
           }
         } catch (error) {
@@ -88,6 +110,13 @@ const callbacks: Record<string, () => void> = {
             mainWindow.webContents.send('solution-stopped')
           }
         } else if (endedNaturally) {
+          // Add assistant response to conversation history
+          if (assistantResponse) {
+            conversationMessages.push({
+              role: 'assistant',
+              content: assistantResponse
+            })
+          }
           mainWindow.webContents.send('solution-complete')
         }
       } catch (error) {
@@ -201,4 +230,103 @@ ipcMain.handle('stopSolutionStream', () => {
   if (!currentStreamContext) return false
   abortCurrentStream('user')
   return true
+})
+
+ipcMain.handle('sendFollowUpQuestion', async (_event, question: string) => {
+  const mainWindow = global.mainWindow
+  if (!mainWindow || mainWindow.isDestroyed() || !state.inCoderPage || !settings.apiKey) {
+    return { success: false, error: 'Invalid state' }
+  }
+
+  // Validate that there's an active conversation
+  if (conversationMessages.length === 0) {
+    return { success: false, error: 'No active conversation' }
+  }
+
+  abortCurrentStream('new-request')
+  const streamContext: StreamContext = {
+    controller: new AbortController(),
+    reason: null
+  }
+  currentStreamContext = streamContext
+
+  // Add a separator before the follow-up response
+  mainWindow.webContents.send('solution-chunk', '\n\n---\n\n')
+
+  let endedNaturally = true
+  let streamStarted = false
+  let assistantResponse = ''
+
+  try {
+    const followUpStream = getFollowUpStream(
+      conversationMessages,
+      question,
+      streamContext.controller.signal
+    )
+    streamStarted = true
+
+    try {
+      for await (const chunk of followUpStream) {
+        if (streamContext.controller.signal.aborted) {
+          endedNaturally = false
+          break
+        }
+        assistantResponse += chunk
+        mainWindow.webContents.send('solution-chunk', chunk)
+      }
+    } catch (error) {
+      if (!streamContext.controller.signal.aborted) {
+        endedNaturally = false
+        console.error('Error streaming follow-up solution:', error)
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+        mainWindow.webContents.send('solution-error', errorMessage)
+      } else {
+        endedNaturally = false
+      }
+    }
+
+    if (streamContext.controller.signal.aborted) {
+      if (streamContext.reason === 'user') {
+        mainWindow.webContents.send('solution-stopped')
+      }
+    } else if (endedNaturally) {
+      // Update conversation history with user question and assistant response
+      conversationMessages.push({
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: question
+          }
+        ]
+      })
+      if (assistantResponse) {
+        conversationMessages.push({
+          role: 'assistant',
+          content: assistantResponse
+        })
+      }
+      mainWindow.webContents.send('solution-complete')
+    }
+  } catch (error) {
+    if (streamContext.controller.signal.aborted) {
+      if (streamContext.reason === 'user') {
+        mainWindow.webContents.send('solution-stopped')
+      }
+    } else {
+      endedNaturally = false
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      console.error('Error streaming follow-up solution:', error)
+      mainWindow.webContents.send('solution-error', errorMessage)
+    }
+  } finally {
+    if (currentStreamContext === streamContext) {
+      currentStreamContext = null
+    }
+    if (!streamStarted && streamContext.reason === 'user') {
+      mainWindow.webContents.send('solution-stopped')
+    }
+  }
+
+  return { success: true }
 })

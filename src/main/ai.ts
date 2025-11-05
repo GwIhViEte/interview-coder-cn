@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { streamText } from 'ai'
+import { streamText, type ModelMessage } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
 import { settings } from './settings'
 
@@ -31,6 +31,40 @@ export function getSolutionStream(base64Image: string, abortSignal?: AbortSignal
         ]
       }
     ],
+    abortSignal
+  })
+  return textStream
+}
+
+export function getFollowUpStream(
+  messages: ModelMessage[],
+  userQuestion: string,
+  abortSignal?: AbortSignal
+) {
+  const openai = createOpenAI({
+    baseURL: settings.apiBaseURL,
+    apiKey: settings.apiKey
+  })
+
+  // Add the user's follow-up question to the conversation
+  const updatedMessages: ModelMessage[] = [
+    ...messages,
+    {
+      role: 'user',
+      content: [
+        {
+          type: 'text',
+          text: userQuestion
+        }
+      ]
+    }
+  ]
+
+  const { textStream } = streamText({
+    model: openai(settings.model || 'gpt-4o-mini'),
+    system:
+      settings.customPrompt || PROMPT_SYSTEM + `\n使用编程语言：${settings.codeLanguage} 解答。`,
+    messages: updatedMessages,
     abortSignal
   })
   return textStream
