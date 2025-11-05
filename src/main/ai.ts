@@ -1,7 +1,10 @@
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { streamText } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
-import { PROMPT_SYSTEM } from './prompts'
 import { settings } from './settings'
+
+export const PROMPT_SYSTEM = readFileSync(join(import.meta.dirname, 'prompts.md'), 'utf-8').trim()
 
 export function getSolutionStream(base64Image: string, abortSignal?: AbortSignal) {
   const openai = createOpenAI({
@@ -11,14 +14,15 @@ export function getSolutionStream(base64Image: string, abortSignal?: AbortSignal
 
   const { textStream } = streamText({
     model: openai(settings.model || 'gpt-4o-mini'),
-    system: settings.customPrompt || PROMPT_SYSTEM,
+    system:
+      settings.customPrompt || PROMPT_SYSTEM + `\n使用编程语言：${settings.codeLanguage} 解答。`,
     messages: [
       {
         role: 'user',
         content: [
           {
             type: 'text',
-            text: `以下是一张截图。编程语言：${settings.codeLanguage || '未指定'}。请严格将所有代码放在 Markdown 代码块中（使用三反引号，若可请标注语言），解释文字放在代码块之外。`
+            text: `这是屏幕截图`
           },
           {
             type: 'image',
