@@ -1,6 +1,5 @@
 import 'dotenv/config'
-import { app, BrowserWindow, globalShortcut, dialog } from 'electron'
-import { autoUpdater } from 'electron-updater'
+import { app, BrowserWindow, globalShortcut } from 'electron'
 
 type AbortLikeError = {
   name?: string
@@ -30,6 +29,7 @@ process.on('uncaughtException', (error) => {
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import './shortcuts'
 import { createWindow } from './main-window'
+import { initAutoUpdater } from './auto-updater'
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -47,52 +47,8 @@ app.whenReady().then(() => {
 
   createWindow()
 
-  // Configure auto-updater: prompt to download when update is available
-  try {
-    autoUpdater.autoDownload = false
-    autoUpdater.on('update-available', async () => {
-      const result = await dialog.showMessageBox({
-        type: 'info',
-        buttons: ['立即下载', '稍后'],
-        defaultId: 0,
-        cancelId: 1,
-        title: '发现新版本',
-        message: '检测到新版本可用。',
-        detail: '现在下载并安装更新吗？'
-      })
-      if (result.response === 0) {
-        autoUpdater.downloadUpdate().catch((err) => console.error(err))
-      }
-    })
-
-    autoUpdater.on('error', (error) => {
-      console.error('Auto update error:', error)
-    })
-
-    autoUpdater.on('update-not-available', () => {
-      // no-op
-    })
-
-    autoUpdater.on('update-downloaded', async () => {
-      const res = await dialog.showMessageBox({
-        type: 'info',
-        buttons: ['立即重启', '稍后'],
-        defaultId: 0,
-        cancelId: 1,
-        title: '更新已就绪',
-        message: '更新已下载完成。',
-        detail: '是否立即重启以应用更新？'
-      })
-      if (res.response === 0) {
-        setImmediate(() => autoUpdater.quitAndInstall())
-      }
-    })
-
-    // Trigger the check after window creation
-    autoUpdater.checkForUpdates().catch((err) => console.error(err))
-  } catch (e) {
-    console.error('Failed to initialize auto-updater:', e)
-  }
+  // Configure auto-updater
+  initAutoUpdater()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
