@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useShortcutsStore } from '@/lib/store/shortcuts'
 import { useSolutionStore } from '@/lib/store/solution'
 import MarkdownRenderer from '@/components/MarkdownRenderer'
@@ -16,13 +16,24 @@ export function AppContent() {
     clearSolution
   } = useSolutionStore()
 
+  const [recentScreenshots, setRecentScreenshots] = useState<string[]>([])
+
   useEffect(() => {
-    // Listen for screenshot events
+    // Listen for screenshot events (latest)
     window.api.onScreenshotTaken((data: string) => {
       setScreenshotData(data)
-      // Clear previous solution when new screenshot is taken
+    })
+
+    // Listen for screenshots-updated events (gallery)
+    window.api.onScreenshotsUpdated((screenshots: string[]) => {
+      setRecentScreenshots(screenshots)
+    })
+
+    // New session clear (pictures + answers)
+    window.api.onSolutionClear(() => {
       clearSolution()
-      setIsLoading(true)
+      setRecentScreenshots([])
+      setScreenshotData(null)
     })
 
     // Listen for solution chunks
@@ -30,10 +41,22 @@ export function AppContent() {
       addSolutionChunk(chunk)
     })
 
+    // AI loading
+    window.api.onAiLoadingStart(() => {
+      setIsLoading(true)
+    })
+    window.api.onAiLoadingEnd(() => {
+      setIsLoading(false)
+    })
+
     // Cleanup listeners on unmount
     return () => {
       window.api.removeScreenshotListener()
+      window.api.removeScreenshotsUpdatedListener()
       window.api.removeSolutionChunkListener()
+      window.api.removeAiLoadingStartListener()
+      window.api.removeAiLoadingEndListener()
+      window.api.removeSolutionClearListener()
     }
   }, [setScreenshotData, clearSolution, setIsLoading, addSolutionChunk])
 
@@ -85,8 +108,20 @@ export function AppContent() {
 
   return (
     <div id="app-content" className="px-6 py-4">
-      {/* Screenshot Display */}
-      {screenshotData ? (
+      {/* Screenshot Gallery */}
+      {recentScreenshots.length > 0 ? (
+        <div className="mb-4 flex gap-2 overflow-x-auto pb-2">
+          {recentScreenshots.map((data, index) => (
+            <img
+              key={index}
+              src={`data:image/png;base64,${data}`}
+              alt={`Screenshot ${index + 1}`}
+              className="w-40 h-auto flex-shrink-0 border border-gray-600 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
+              title={`第 ${index + 1} 张截图`}
+            />
+          ))}
+        </div>
+      ) : screenshotData ? (
         <div className="mb-4">
           <img
             src={`data:image/png;base64,${screenshotData}`}

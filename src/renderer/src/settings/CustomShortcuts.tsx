@@ -71,6 +71,7 @@ export function CustomShortcuts() {
           <h3 className="text-sm text-gray-500">截图与AI</h3>
           <Shortcut label="截图" shortcut="takeScreenshot" />
           <Shortcut label="停止生成" shortcut="stopSolutionStream" />
+          <Shortcut label="追加截图 (长题目)" shortcut="appendScreenshot" />
         </div>
 
         {/* Navigation */}

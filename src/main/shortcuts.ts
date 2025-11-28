@@ -2,7 +2,7 @@ import { globalShortcut, ipcMain } from 'electron'
 import type { BrowserWindow } from 'electron'
 import type { ModelMessage } from 'ai'
 import { takeScreenshot } from './take-screenshot'
-import { getSolutionStream, getFollowUpStream } from './ai'
+import { getSolutionStream, getFollowUpStream, getGeneralStream } from './ai'
 import { state } from './state'
 import { settings } from './settings'
 
@@ -34,6 +34,8 @@ let currentStreamContext: StreamContext | null = null
 
 // Conversation history tracking
 let conversationMessages: ModelMessage[] = []
+let recentScreenshots: string[] = [] // 最近截图，水平预览 (限5张)
+let hasAppendSeparator = false
 
 const FRONT_REASSERT_DURATION = 5000
 const FRONT_REASSERT_INTERVAL = 150
@@ -101,6 +103,7 @@ const callbacks: Record<string, () => void> = {
     if (!mainWindow || mainWindow.isDestroyed() || !state.inCoderPage || !settings.apiKey) return
 
     abortCurrentStream('new-request')
+    let loadingStarted = false
     const screenshotData = await takeScreenshot()
     if (screenshotData && mainWindow && !mainWindow.isDestroyed()) {
       conversationMessages = [
@@ -124,7 +127,13 @@ const callbacks: Record<string, () => void> = {
         reason: null
       }
       currentStreamContext = streamContext
+      recentScreenshots = [screenshotData]
+      hasAppendSeparator = false
+      mainWindow.webContents.send('solution-clear')
+      mainWindow.webContents.send('screenshots-updated', recentScreenshots)
       mainWindow.webContents.send('screenshot-taken', screenshotData)
+      mainWindow.webContents.send('ai-loading-start')
+      loadingStarted = true
       let endedNaturally = true
       let streamStarted = false
       let assistantResponse = ''
@@ -182,6 +191,128 @@ const callbacks: Record<string, () => void> = {
         }
         if (!streamStarted && streamContext.reason === 'user') {
           mainWindow.webContents.send('solution-stopped')
+        }
+        if (loadingStarted && mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send('ai-loading-end')
+        }
+      }
+    }
+  },
+
+  // Append screenshot for continuous capture (if conversation exists)
+  appendScreenshot: async () => {
+    const mainWindow = global.mainWindow
+    if (!mainWindow || mainWindow.isDestroyed() || !state.inCoderPage || !settings.apiKey) return
+
+    // Fallback to first screenshot if no conversation
+    if (conversationMessages.length === 0) {
+      callbacks.takeScreenshot()
+      return
+    }
+
+    abortCurrentStream('new-request')
+    let loadingStarted = false
+
+    const screenshotData = await takeScreenshot()
+    if (screenshotData && mainWindow && !mainWindow.isDestroyed()) {
+      // Append new image message to conversation
+      const newUserMessage: ModelMessage = {
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: '这是下一部分截图，请结合之前所有截图和分析，继续完整解答整个题目，不要遗漏任何信息。'
+          },
+          {
+            type: 'image',
+            image: screenshotData
+          }
+        ]
+      }
+      conversationMessages.push(newUserMessage)
+
+      const streamContext: StreamContext = {
+        controller: new AbortController(),
+        reason: null
+      }
+      currentStreamContext = streamContext
+
+      recentScreenshots.push(screenshotData)
+      recentScreenshots = recentScreenshots.slice(-5) // 限5张
+      mainWindow.webContents.send('screenshot-taken', screenshotData)
+      mainWindow.webContents.send('screenshots-updated', recentScreenshots)
+      if (!hasAppendSeparator) {
+        mainWindow.webContents.send('solution-chunk', '\n\n---\n\n')
+        hasAppendSeparator = true
+      } else {
+        mainWindow.webContents.send('solution-chunk', '\n\n')
+      }
+      mainWindow.webContents.send('ai-loading-start')
+      loadingStarted = true
+
+      let endedNaturally = true
+      let streamStarted = false
+      let assistantResponse = ''
+      try {
+        const solutionStream = getGeneralStream(
+          conversationMessages,
+          streamContext.controller.signal
+        )
+        streamStarted = true
+        try {
+          for await (const chunk of solutionStream) {
+            if (streamContext.controller.signal.aborted) {
+              endedNaturally = false
+              break
+            }
+            assistantResponse += chunk
+            mainWindow.webContents.send('solution-chunk', chunk)
+          }
+        } catch (error) {
+          if (!streamContext.controller.signal.aborted) {
+            endedNaturally = false
+            console.error('Error streaming continuous solution:', error)
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+            mainWindow.webContents.send('solution-error', errorMessage)
+          } else {
+            endedNaturally = false
+          }
+        }
+
+        if (streamContext.controller.signal.aborted) {
+          if (streamContext.reason === 'user') {
+            mainWindow.webContents.send('solution-stopped')
+          }
+        } else if (endedNaturally) {
+          // Add assistant response to conversation history
+          if (assistantResponse) {
+            conversationMessages.push({
+              role: 'assistant',
+              content: assistantResponse
+            })
+          }
+          mainWindow.webContents.send('solution-complete')
+        }
+      } catch (error) {
+        if (streamContext.controller.signal.aborted) {
+          if (streamContext.reason === 'user') {
+            mainWindow.webContents.send('solution-stopped')
+          }
+        } else {
+          endedNaturally = false
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+          console.error('Error streaming continuous solution:', error)
+          mainWindow.webContents.send('solution-error', errorMessage)
+        }
+      } finally {
+        if (currentStreamContext === streamContext) {
+          currentStreamContext = null
+        }
+        if (!streamStarted && streamContext.reason === 'user') {
+          mainWindow.webContents.send('solution-stopped')
+        }
+        if (loadingStarted && mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send('ai-loading-end')
         }
       }
     }
