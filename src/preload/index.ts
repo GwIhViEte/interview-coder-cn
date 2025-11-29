@@ -94,6 +94,16 @@ const api = {
     ipcRenderer.removeAllListeners('scroll-page-up')
   },
 
+  // Listen for screenshots-updated (gallery)
+  onScreenshotsUpdated: (callback: (screenshots: string[]) => void) => {
+    ipcRenderer.on('screenshots-updated', (_event, screenshots) => {
+      callback(screenshots)
+    })
+  },
+  removeScreenshotsUpdatedListener: () => {
+    ipcRenderer.removeAllListeners('screenshots-updated')
+  },
+
   // Listen for scroll page down
   onScrollPageDown: (callback: () => void) => {
     ipcRenderer.on('scroll-page-down', callback)
@@ -101,6 +111,28 @@ const api = {
   // Remove scroll page down listener
   removeScrollPageDownListener: () => {
     ipcRenderer.removeAllListeners('scroll-page-down')
+  },
+
+  // AI loading events
+  onAiLoadingStart: (callback: () => void) => {
+    ipcRenderer.on('ai-loading-start', callback)
+  },
+  onAiLoadingEnd: (callback: () => void) => {
+    ipcRenderer.on('ai-loading-end', callback)
+  },
+  removeAiLoadingStartListener: () => {
+    ipcRenderer.removeAllListeners('ai-loading-start')
+  },
+  removeAiLoadingEndListener: () => {
+    ipcRenderer.removeAllListeners('ai-loading-end')
+  },
+
+  // Solution clear event (new session)
+  onSolutionClear: (callback: () => void) => {
+    ipcRenderer.on('solution-clear', callback)
+  },
+  removeSolutionClearListener: () => {
+    ipcRenderer.removeAllListeners('solution-clear')
   }
 }
 

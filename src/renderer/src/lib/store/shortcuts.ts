@@ -46,6 +46,11 @@ const defaultShortcuts: Record<string, Omit<Shortcut, 'defaultKey'>> = {
     category: 'Window Management'
   },
   takeScreenshot: { action: 'takeScreenshot', key: 'Alt+Enter', category: 'Screenshot & AI' },
+  appendScreenshot: {
+    action: 'appendScreenshot',
+    key: 'Alt+Shift+Enter',
+    category: 'Screenshot & AI'
+  },
   stopSolutionStream: {
     action: 'stopSolutionStream',
     key: 'Alt+.',

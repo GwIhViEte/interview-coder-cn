@@ -69,3 +69,21 @@ export function getFollowUpStream(
   })
   return textStream
 }
+
+export function getGeneralStream(messages: ModelMessage[], abortSignal?: AbortSignal) {
+  const openai = createOpenAI({
+    baseURL: settings.apiBaseURL,
+    apiKey: settings.apiKey
+  })
+
+  const { textStream } = streamText({
+    model: openai(settings.model || 'gpt-4o-mini'),
+    system:
+      settings.customPrompt ||
+      PROMPT_SYSTEM +
+        `\n使用编程语言：${settings.codeLanguage} 解答。\n\n注意：如果有多张截图，请结合所有截图内容进行完整分析，不要遗漏任何部分。`,
+    messages,
+    abortSignal
+  })
+  return textStream
+}
