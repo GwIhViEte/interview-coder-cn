@@ -51,12 +51,12 @@ export function AppStatusBar() {
   }
 
   // Check if there's an active conversation
-  const hasActiveConversation = screenshotData && solutionChunks.length > 0 && !isReceivingSolution
+  const hasActiveConversation = screenshotData && solutionChunks.length > 0
 
   return (
     <div className="absolute bottom-0 flex items-center justify-between w-full text-blue-100 bg-gray-600/10 px-4 pb-1">
       <div>
-        {isReceivingSolution && (
+        {isReceivingSolution ? (
           <div className="flex items-center space-x-2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-r-2 border-[currentColor]"></div>
             <span className="text-sm">正在生成...</span>
@@ -75,11 +75,28 @@ export function AppStatusBar() {
               </Button>
             </div>
           </div>
-        )}
+        ) : hasActiveConversation ? (
+          <div className="flex items-center space-x-2 pointer-events-none opacity-50 text-sm gap-1">
+            <span>
+              <ShortcutRenderer
+                shortcut="Shift+Alt+Enter"
+                className="inline-block scale-75 text-xs border border-current bg-transparent py-0 px-1 ml-1"
+              />
+              追加截图
+            </span>
+            <span>
+              <ShortcutRenderer
+                shortcut="Alt+Enter"
+                className="inline-block scale-75 text-xs border border-current bg-transparent py-0 px-1"
+              />
+              新开对话
+            </span>
+          </div>
+        ) : null}
       </div>
       <div className="flex items-center space-x-4 select-none">
         {/* Follow-up Question Button */}
-        {hasActiveConversation && (
+        {hasActiveConversation && !isReceivingSolution && (
           <Button
             variant="ghost"
             size="sm"

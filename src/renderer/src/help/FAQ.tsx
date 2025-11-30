@@ -5,7 +5,23 @@ import { HelpSection } from './components'
 const faqs = [
   {
     question: '如何截取屏幕截图？',
-    answer: '按下 Alt+Enter 或 ⌥↵ 快捷键即可截取当前屏幕的截图。截图会自动显示在应用中。'
+    answer: (
+      <span>
+        按下
+        <ShortcutRenderer shortcut="Alt+Enter" className="text-xs mx-1" />
+        快捷键即可截取当前屏幕的截图。截图会自动显示在应用中。
+      </span>
+    )
+  },
+  {
+    question: '如何处理题目超过一屏的情况？',
+    answer: (
+      <span>
+        按下
+        <ShortcutRenderer shortcut="Alt+Shift+Enter" className="text-xs mx-1" />
+        快捷键即可在当前对话中追加截图并生成解题建议。
+      </span>
+    )
   },
   {
     question: '分享屏幕时，对方能看到应用吗？',

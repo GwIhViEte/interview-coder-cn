@@ -69,9 +69,17 @@ export function CustomShortcuts() {
         {/* Screenshot & AI */}
         <div className="space-y-2">
           <h3 className="text-sm text-gray-500">截图与AI</h3>
-          <Shortcut label="截图" shortcut="takeScreenshot" />
+          <Shortcut
+            label="截图"
+            description="截图并生成解题建议（会新开对话）"
+            shortcut="takeScreenshot"
+          />
+          <Shortcut
+            label="追加截图"
+            description="在当前对话中追加截图并生成解题建议，适用于长题目等场景"
+            shortcut="appendScreenshot"
+          />
           <Shortcut label="停止生成" shortcut="stopSolutionStream" />
-          <Shortcut label="追加截图 (长题目)" shortcut="appendScreenshot" />
         </div>
 
         {/* Navigation */}

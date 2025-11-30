@@ -9,6 +9,7 @@ import {
   Info
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import ShortcutRenderer from '@/components/ShortcutRenderer'
 import { HelpSection } from './components'
 import { Shortcuts } from './Shortcuts'
 import { FAQ } from './FAQ'
@@ -74,17 +75,7 @@ export default function HelpPage() {
             <h3 className="font-semibold mb-2">1. 截取屏幕截图</h3>
             <p className="text-sm text-gray-700">
               当您需要分析某个问题时，按下快捷键{' '}
-              <span>
-                <kbd className="bg-gray-200 rounded p-1">Alt</kbd>+
-                <kbd className="bg-gray-200 rounded p-1">Enter</kbd>
-                <span className="text-xs"> (Windows)</span>
-              </span>{' '}
-              /{' '}
-              <span>
-                <kbd className="bg-gray-200 rounded p-1">⌥</kbd>+
-                <kbd className="bg-gray-200 rounded p-1">↵</kbd>
-                <span className="text-xs"> (Mac)</span>
-              </span>{' '}
+              <ShortcutRenderer shortcut="Alt+Enter" className="text-xs mx-1" />
               截取当前屏幕。截图会立即显示在应用中。
             </p>
           </div>
