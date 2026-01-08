@@ -6,6 +6,43 @@ import { getSolutionStream, getFollowUpStream, getGeneralStream } from './ai'
 import { state } from './state'
 import { settings } from './settings'
 
+/**
+ * Extract meaningful error message from API errors
+ */
+function extractErrorMessage(error: unknown): string {
+  if (!(error instanceof Error)) {
+    return String(error) || '未知错误'
+  }
+
+  // Try to extract responseBody from AI SDK errors
+  const apiError = error as Error & {
+    responseBody?: string
+    statusCode?: number
+    data?: unknown
+  }
+
+  // Try to parse responseBody for detailed message
+  if (apiError.responseBody) {
+    try {
+      const body = JSON.parse(apiError.responseBody)
+      if (body.message) {
+        return body.message
+      }
+      if (body.error?.message) {
+        return body.error.message
+      }
+    } catch {
+      // If parsing fails, use responseBody as is
+      if (typeof apiError.responseBody === 'string' && apiError.responseBody.length < 200) {
+        return apiError.responseBody
+      }
+    }
+  }
+
+  // Fallback to error message
+  return error.message || '未知错误'
+}
+
 type Shortcut = {
   action: string
   key: string
@@ -153,8 +190,7 @@ const callbacks: Record<string, () => void> = {
           if (!streamContext.controller.signal.aborted) {
             endedNaturally = false
             console.error('Error streaming solution:', error)
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-            mainWindow.webContents.send('solution-error', errorMessage)
+            mainWindow.webContents.send('solution-error', extractErrorMessage(error))
           } else {
             endedNaturally = false
           }
@@ -181,9 +217,8 @@ const callbacks: Record<string, () => void> = {
           }
         } else {
           endedNaturally = false
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
           console.error('Error streaming solution:', error)
-          mainWindow.webContents.send('solution-error', errorMessage)
+          mainWindow.webContents.send('solution-error', extractErrorMessage(error))
         }
       } finally {
         if (currentStreamContext === streamContext) {
@@ -272,8 +307,7 @@ const callbacks: Record<string, () => void> = {
           if (!streamContext.controller.signal.aborted) {
             endedNaturally = false
             console.error('Error streaming continuous solution:', error)
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-            mainWindow.webContents.send('solution-error', errorMessage)
+            mainWindow.webContents.send('solution-error', extractErrorMessage(error))
           } else {
             endedNaturally = false
           }
@@ -300,9 +334,8 @@ const callbacks: Record<string, () => void> = {
           }
         } else {
           endedNaturally = false
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
           console.error('Error streaming continuous solution:', error)
-          mainWindow.webContents.send('solution-error', errorMessage)
+          mainWindow.webContents.send('solution-error', extractErrorMessage(error))
         }
       } finally {
         if (currentStreamContext === streamContext) {
@@ -499,8 +532,7 @@ ipcMain.handle('sendFollowUpQuestion', async (_event, question: string) => {
       if (!streamContext.controller.signal.aborted) {
         endedNaturally = false
         console.error('Error streaming follow-up solution:', error)
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-        mainWindow.webContents.send('solution-error', errorMessage)
+        mainWindow.webContents.send('solution-error', extractErrorMessage(error))
       } else {
         endedNaturally = false
       }
@@ -536,9 +568,8 @@ ipcMain.handle('sendFollowUpQuestion', async (_event, question: string) => {
       }
     } else {
       endedNaturally = false
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       console.error('Error streaming follow-up solution:', error)
-      mainWindow.webContents.send('solution-error', errorMessage)
+      mainWindow.webContents.send('solution-error', extractErrorMessage(error))
     }
   } finally {
     if (currentStreamContext === streamContext) {
