@@ -13,12 +13,12 @@ import {
 } from '@/components/ui/command'
 
 const defaultModels = [
-  { value: 'gpt-4o-mini', label: 'gpt-4o-mini' },
-  { value: 'gpt-4o', label: 'gpt-4o' },
-  { value: 'gpt-4.1-mini', label: 'gpt-4.1-mini' },
-  { value: 'gpt-4.1', label: 'gpt-4.1' },
+  { value: 'Qwen/Qwen3-VL-32B-Instruct', label: 'Qwen/Qwen3-VL-32B-Instruct' },
+  { value: 'Qwen/Qwen3-VL-8B-Thinking', label: 'Qwen/Qwen3-VL-8B-Thinking' },
+  { value: 'zai-org/GLM-4.6V', label: 'zai-org/GLM-4.6V' },
   { value: 'gpt-5-mini', label: 'gpt-5-mini' },
-  { value: 'gpt-5', label: 'gpt-5' }
+  { value: 'gpt-5.1-codex', label: 'gpt-5.1-codex' },
+  { value: 'gpt-5.2', label: 'gpt-5.2' }
 ]
 
 export function SelectModel({

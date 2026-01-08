@@ -64,7 +64,12 @@ export default function SettingsPage() {
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">API Base URL</label>
+              <label className="text-sm font-medium">
+                API Base URL
+                <span className="ml-2 text-xs font-light">
+                  如硅基流动为 https://api.siliconflow.cn/v1
+                </span>
+              </label>
               <input
                 type="text"
                 value={apiBaseURL}
@@ -96,7 +101,12 @@ export default function SettingsPage() {
             </div>
 
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">Model</label>
+              <label className="text-sm font-medium">
+                Model
+                <span className="ml-2 text-xs font-light">
+                  这里列了几个流行的国内和国外模型，请自行确认你的平台是否支持
+                </span>
+              </label>
               <SelectModel value={model} onChange={(val) => updateSetting('model', val)} />
             </div>
           </div>

@@ -6,6 +6,13 @@ import { settings } from './settings'
 
 export const PROMPT_SYSTEM = readFileSync(join(import.meta.dirname, 'prompts.md'), 'utf-8').trim()
 
+function getModel(_settings: typeof settings) {
+  const fallbackModel = settings.apiBaseURL.includes('siliconflow')
+    ? 'Qwen/Qwen3-VL-32B-Instruct'
+    : 'gpt-5-mini'
+  return _settings.model || fallbackModel
+}
+
 export function getSolutionStream(base64Image: string, abortSignal?: AbortSignal) {
   const openai = createOpenAI({
     baseURL: settings.apiBaseURL,
@@ -13,7 +20,7 @@ export function getSolutionStream(base64Image: string, abortSignal?: AbortSignal
   })
 
   const { textStream } = streamText({
-    model: openai(settings.model || 'gpt-4o-mini'),
+    model: openai.chat(getModel(settings)),
     system:
       settings.customPrompt || PROMPT_SYSTEM + `\n使用编程语言：${settings.codeLanguage} 解答。`,
     messages: [
@@ -31,7 +38,10 @@ export function getSolutionStream(base64Image: string, abortSignal?: AbortSignal
         ]
       }
     ],
-    abortSignal
+    abortSignal,
+    onError: (err) => {
+      throw err.error ?? err
+    }
   })
   return textStream
 }
@@ -61,11 +71,14 @@ export function getFollowUpStream(
   ]
 
   const { textStream } = streamText({
-    model: openai(settings.model || 'gpt-4o-mini'),
+    model: openai.chat(getModel(settings)),
     system:
       settings.customPrompt || PROMPT_SYSTEM + `\n使用编程语言：${settings.codeLanguage} 解答。`,
     messages: updatedMessages,
-    abortSignal
+    abortSignal,
+    onError: (err) => {
+      throw err.error ?? err
+    }
   })
   return textStream
 }
@@ -77,13 +90,16 @@ export function getGeneralStream(messages: ModelMessage[], abortSignal?: AbortSi
   })
 
   const { textStream } = streamText({
-    model: openai(settings.model || 'gpt-4o-mini'),
+    model: openai.chat(getModel(settings)),
     system:
       settings.customPrompt ||
       PROMPT_SYSTEM +
         `\n使用编程语言：${settings.codeLanguage} 解答。\n\n注意：如果有多张截图，请结合所有截图内容进行完整分析，不要遗漏任何部分。`,
     messages,
-    abortSignal
+    abortSignal,
+    onError: (err) => {
+      throw err.error ?? err
+    }
   })
   return textStream
 }

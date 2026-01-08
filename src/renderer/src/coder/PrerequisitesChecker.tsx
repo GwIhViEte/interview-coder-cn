@@ -50,7 +50,7 @@ export function PrerequisitesChecker() {
             <label className="block text-sm font-medium text-gray-700">
               API Base URL{' '}
               <span className="text-xs font-normal text-gray-500">
-                (可选，使用 OpenAI 代理服务时需要配置该项)
+                (可选，使用 硅基流动 或 OpenAI 代理服务 时需要配置该项)
               </span>
             </label>
             <input
