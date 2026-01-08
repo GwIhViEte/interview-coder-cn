@@ -2,11 +2,11 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { streamText, type ModelMessage } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
-import { settings } from './settings'
+import { settings, AppSettings } from './settings'
 
 export const PROMPT_SYSTEM = readFileSync(join(import.meta.dirname, 'prompts.md'), 'utf-8').trim()
 
-function getModel(_settings: typeof settings) {
+function getModel(_settings: AppSettings) {
   const fallbackModel = settings.apiBaseURL.includes('siliconflow')
     ? 'Qwen/Qwen3-VL-32B-Instruct'
     : 'gpt-5-mini'

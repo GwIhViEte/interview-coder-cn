@@ -9,9 +9,9 @@ ipcMain.handle('updateAppSettings', (_event, _settings) => {
 })
 
 export const settings = {
-  apiBaseURL: process.env.API_BASE_URL || 'https://api.openai.com/v1',
+  apiBaseURL: process.env.API_BASE_URL || '',
   apiKey: process.env.API_KEY || '',
-  model: process.env.MODEL || 'gpt-4o-mini',
+  model: process.env.MODEL || '',
   codeLanguage: process.env.CODE_LANGUAGE || 'typescript',
   customPrompt: ''
 }
