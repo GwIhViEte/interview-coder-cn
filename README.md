@@ -51,12 +51,12 @@ $ npm install
 
 在项目根目录创建一个 `.env` 文件，并配置 `API_BASE_URL` 和 `API_KEY`。
 
-API_BASE_URL 和 API_KEY 需要从支持 OpenAI API 的代理服务商处获取。如 [CloseAI](https://www.closeai-asia.com/)、[AIHubMix](https://aihubmix.com/) 等服务商，支持支付宝付款，开账户很方便。
+API_BASE_URL 和 API_KEY 需要从支持 OpenAI API 的代理服务商处获取。如国内的 [硅基流动](https://cloud.siliconflow.cn/i/SG8C0772) 或国外的 [OpenRouter](https://openrouter.ai/) 等服务商，支持支付宝付款。
 
 当然，如果你（人在海外）可以直接使用 OpenAI 官方的 API 更好，只需要配置 `API_KEY` 就够了。
 
 ```env
-API_BASE_URL="https://api.openai-proxy.org/v1" # 代理服务商的 API 地址，这里以 CloseAI 为例
+API_BASE_URL="https://openrouter.ai/api/v1" # 聚合服务的 API 地址，这里以 OpenRouter 为例
 API_KEY="sk-1234567890" # 代理服务商的 API Key，这里只是示例，需要改成你自己的
 ```
 

@@ -30,18 +30,24 @@ export function PrerequisitesChecker() {
       <div className="m-auto bg-white rounded-lg p-6 pt-1 w-120 shadow-lg">
         <h1 className="text-xl font-bold text-center mb-2">欢迎使用解题助手</h1>
         <div className="text-sm text-gray-600">
-          请先配置 ChatGPT API Key，如无 API Key，请先前往{' '}
-          <a href="https://platform.openai.com/account/api-keys" target="_blank" rel="noreferrer">
-            OpenAI
-          </a>{' '}
-          申请。如果直接使用 OpenAI 有网络或者支付等限制，这里推荐大家使用 API 代理服务，如{' '}
-          <a href="https://referer.shadowai.xyz/r/1031823" target="_blank" rel="noreferrer">
-            CloseAI
+          请先配置大模型聚合平台信息，如国内的
+          <a
+            href="https://cloud.siliconflow.cn/i/SG8C0772"
+            target="_blank"
+            rel="noreferrer"
+            className="text-blue-500 mx-1"
+          >
+            硅基流动
           </a>
-          ，
-          <a href="https://aihubmix.com?aff=ZniA" target="_blank" rel="noreferrer">
-            AiHubMix
-          </a>{' '}
+          或国外的
+          <a
+            href="https://openrouter.ai/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-blue-500 mx-1"
+          >
+            OpenRouter
+          </a>
           等 。
         </div>
 
@@ -50,7 +56,7 @@ export function PrerequisitesChecker() {
             <label className="block text-sm font-medium text-gray-700">
               API Base URL{' '}
               <span className="text-xs font-normal text-gray-500">
-                (可选，使用 硅基流动 或 OpenAI 代理服务 时需要配置该项)
+                (配置硅基流动或其他代理服务商的 API Base URL 地址)
               </span>
             </label>
             <input
